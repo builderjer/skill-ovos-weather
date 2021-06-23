@@ -326,14 +326,17 @@ class WeatherSkill(MycroftSkill):
 
     @skill_api_method
     def get_current_weather_homescreen(self):
-        unit = self.__get_temperature_unit()
-        report = self.__initialize_report(None)
-        current_report = self.__populate_current(report, unit)
-        weather_code = str(current_report['icon'])
-        img_code = self.CODES[weather_code]
-        current_weather = current_report["temp"]
-        result = {"weather_code": img_code, "weather_temp": current_weather}
-        return result
+        try:
+            unit = self.__get_temperature_unit()
+            report = self.__initialize_report(None)
+            current_report = self.__populate_current(report, unit)
+            weather_code = str(current_report['icon'])
+            img_code = self.CODES[weather_code]
+            current_weather = current_report["temp"]
+            result = {"weather_code": img_code, "weather_temp": current_weather}
+            return result
+        except:
+            self.log.error("Creating Weather Report Failed")
 
     def prime_weather_cache(self):
         # If not already cached, this will reach out for current conditions
