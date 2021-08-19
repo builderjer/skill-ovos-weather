@@ -1108,7 +1108,7 @@ class WeatherSkill(MycroftSkill):
         except Exception:
             self.log.exception("Unexpected error getting weather for skill API.")
 
-    def stop():
+    def stop(self):
         self.gui.release()
 
 def create_skill():
