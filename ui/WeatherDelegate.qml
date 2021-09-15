@@ -228,7 +228,7 @@ Mycroft.Delegate {
         switch(weathercode) {
         case 0:
             // Clear Sky Day
-            return "animations/sunny.json";
+            return "animations/sun.json";
             break
         case 1:
             // Clear Sky Night
@@ -244,11 +244,11 @@ Mycroft.Delegate {
             break
         case 4:
             // Scattered Clouds Day
-            return "animations/cloudy.json";
+            return "animations/clouds.json";
             break
         case 5:
             // Scattered Clouds Night
-            return "animations/cloudy.json";
+            return "animations/clouds.json";
             break
         case 6:
             // Broken Clouds Day
