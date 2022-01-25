@@ -26,7 +26,7 @@ from typing import List, Tuple
 from requests import HTTPError
 
 from mycroft.skills import MycroftSkill, intent_handler, skill_api_method
-from mycroft.skills.intent_service import AdaptIntent
+from mycroft.skills.intent_services import AdaptIntent
 from mycroft.messagebus.message import Message
 from mycroft.util.parse import extract_number
 from .skill import (
