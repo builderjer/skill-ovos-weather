@@ -274,6 +274,9 @@ class WeatherReport:
     """Full representation of the data returned by the Open Weather Maps One Call API"""
 
     def __init__(self, report):
+        print("Printing Report")
+        print(report)
+                
         timezone = report["timezone"]
         self.current = CurrentWeather(report["current"], timezone)
         self.hourly = [HourlyWeather(hour, timezone) for hour in report["hourly"]]

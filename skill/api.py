@@ -22,8 +22,12 @@ It also supports returning values in the measurement system (Metric/Imperial)
 provided, precluding us from having to do the conversions.
 
 """
+import os
 from mycroft.api import Api
 from .weather import WeatherReport
+from .ovosbackend import OVOSApiBackend
+from json_database import JsonStorageXDG 
+import threading
 
 OPEN_WEATHER_MAP_LANGUAGES = (
     "af",
@@ -83,6 +87,8 @@ class OpenWeatherMapApi(Api):
     def __init__(self):
         super().__init__(path="owm")
         self.language = "en"
+        self.localbackend = OVOSApiBackend()
+        self.cache_response_location = JsonStorageXDG("skill-weather-response-cache")
 
     def get_weather_for_coordinates(
         self, measurement_system: str, latitude: float, longitude: float
@@ -101,11 +107,64 @@ class OpenWeatherMapApi(Api):
             lon=longitude,
             units=measurement_system
         )
-        api_request = dict(path="/onecall", query=query_parameters)
-        response = self.request(api_request)
-        local_weather = WeatherReport(response)
-
+        self.clear_cache_timer()
+        if self.check_if_cached_weather_exist(latitude, longitude):
+            response = self.get_cached_weather_results(latitude, longitude)
+            local_weather = WeatherReport(response)
+        else:         
+            try: 
+                api_request = dict(path="/onecall", query=query_parameters)
+                response = self.request(api_request)
+                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response}
+                print(weather_cache_response)
+                self.cache_weather_results(weather_cache_response)                
+                local_weather = WeatherReport(response)
+            except:
+                response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
+                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response}
+                print(weather_cache_response)
+                self.cache_weather_results(weather_cache_response)
+                local_weather = WeatherReport(response)
+        
         return local_weather
+    
+    def cache_weather_results(self, weather_response):
+        cache_response = {'lat': weather_response["lat"], 'lon': weather_response["lon"], 'response': weather_response["response"]}
+        if "caches" in self.cache_response_location:
+            cache_responses = self.cache_response_location["caches"]
+        else: 
+            cache_responses = []
+        
+        if cache_response not in cache_responses:
+            cache_responses.append(cache_response)
+            
+        self.cache_response_location["caches"] = cache_responses
+        self.cache_response_location.store()
+        
+    def check_if_cached_weather_exist(self, latitude, longitude):
+        if "caches" in self.cache_response_location:
+            cache_responses = self.cache_response_location["caches"]
+            for cache_response in cache_responses:
+                if cache_response["lat"] == latitude and cache_response["lon"] == longitude:
+                    return True
+                else:
+                    return False
+        else:
+            return False
+    
+    def get_cached_weather_results(self, latitude, longitude):
+        if "caches" in self.cache_response_location:
+            cache_responses = self.cache_response_location["caches"]
+            for cache_response in cache_responses:
+                if cache_response["lat"] == latitude and cache_response["lon"] == longitude:
+                    return cache_response["response"]
+                
+    def clear_cache_timer(self):
+        if "caches" in self.cache_response_location:
+            threading.Timer(900, self.clear_cache).start()
+    
+    def clear_cache(self):
+        os.remove(self.cache_response_location.path)
 
     def set_language_parameter(self, language_config: str):
         """
