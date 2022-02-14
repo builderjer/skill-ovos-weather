@@ -20,7 +20,6 @@ setup(
     package_data={'ovos_skill_weather': ['locale/*', "ui/*", "skill/*"]},
     packages=['ovos_skill_weather'],
     include_package_data=True,
-    install_requires=["ovos-plugin-manager>=0.0.2"],
     keywords='ovos skill plugin',
     entry_points={'ovos.plugin.skill': PLUGIN_ENTRY_POINT}
 )
