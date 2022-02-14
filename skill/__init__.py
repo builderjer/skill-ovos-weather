@@ -24,4 +24,4 @@ from .dialog import (
 from .intent import WeatherIntent
 from .weather import CURRENT, DAILY, DailyWeather, HOURLY, WeatherReport
 from .util import LocationNotFoundError
-from .ovosbackend import OVOSApiBackend
+from .ovosapiservice import OVOSApiService

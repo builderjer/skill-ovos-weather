@@ -3,7 +3,7 @@ import requests
 from json_database import JsonStorageXDG
 
 
-class OVOSApiBackend:
+class OVOSApiService:
     
     def __init__(self) -> None:
         self.uuid_storage = JsonStorageXDG("ovos_api_uuid")
@@ -42,7 +42,6 @@ class OVOSApiBackend:
         self.get_session_challenge()
         
         headers = {'session_challenge': self.get_session_token(), 'backend': 'OWM'}
-        print(headers)       
         reqdata = {"lat": query.get("lat"), "lon": query.get("lon"), "units": query.get("units"), "lang": query.get("lang")}
         onecall_weather_request = requests.post('https://api.openvoiceos.com/weather/onecall_weather_report/' + self.get_uuid(), data=reqdata, headers=headers)
         onecall_weather_response = onecall_weather_request.text
