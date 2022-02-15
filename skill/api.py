@@ -28,6 +28,7 @@ from .weather import WeatherReport
 from .ovosapiservice import OVOSApiService
 from json_database import JsonStorageXDG 
 import threading
+import datetime as dt
 
 OPEN_WEATHER_MAP_LANGUAGES = (
     "af",
@@ -110,17 +111,32 @@ class OpenWeatherMapApi(Api):
         self.clear_cache_timer()
         if self.check_if_cached_weather_exist(latitude, longitude):
             response = self.get_cached_weather_results(latitude, longitude)
-            local_weather = WeatherReport(response)
-        else:         
+            
+            # add additional check for if the time is more than 15 minutes old and if so, refresh the cache
+            if dt.datetime.now() - dt.datetime.strptime(response["time"], "%Y-%m-%d %H:%M:%S") > dt.timedelta(minutes=15):
+                try: 
+                    api_request = dict(path="/onecall", query=query_parameters)
+                    response = self.request(api_request)
+                    weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
+                    self.cache_weather_results(weather_cache_response)
+                    local_weather = WeatherReport(response)
+                except:
+                    response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
+                    weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
+                    self.cache_weather_results(weather_cache_response)
+                    local_weather = WeatherReport(response)    
+            else:
+                local_weather = WeatherReport(response)
+        else:        
             try: 
                 api_request = dict(path="/onecall", query=query_parameters)
                 response = self.request(api_request)
-                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response}
+                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
                 self.cache_weather_results(weather_cache_response)
                 local_weather = WeatherReport(response)
             except:
                 response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
-                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response}
+                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
                 self.cache_weather_results(weather_cache_response)
                 local_weather = WeatherReport(response)
         
