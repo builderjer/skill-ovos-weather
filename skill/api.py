@@ -26,7 +26,7 @@ import os
 from mycroft.api import Api
 from .weather import WeatherReport
 from .ovosapiservice import OVOSApiService
-from json_database import JsonStorageXDG 
+from json_database import JsonStorageXDG
 import threading
 import datetime as dt
 import time
@@ -90,7 +90,8 @@ class OpenWeatherMapApi(Api):
         super().__init__(path="owm")
         self.language = "en"
         self.localbackend = OVOSApiService()
-        self.cache_response_location = JsonStorageXDG("skill-weather-response-cache")
+        self.cache_response_location = JsonStorageXDG(
+            "skill-weather-response-cache")
 
     def get_weather_for_coordinates(
         self, measurement_system: str, latitude: float, longitude: float
@@ -111,52 +112,60 @@ class OpenWeatherMapApi(Api):
         )
         self.clear_cache_timer()
         if self.check_if_cached_weather_exist(latitude, longitude):
-            cache_time = self.get_cached_weather_results(latitude, longitude)[0]
+            cache_time = self.get_cached_weather_results(
+                latitude, longitude)[0]
             response = self.get_cached_weather_results(latitude, longitude)[1]
-            
+
             # add additional check for if the time is more than 15 minutes old and if so, refresh the cache
             if dt.datetime.now() - dt.datetime.fromtimestamp(cache_time) > dt.timedelta(minutes=15):
                 try:
                     api_request = dict(path="/onecall", query=query_parameters)
                     response = self.request(api_request)
-                    weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
+                    weather_cache_response = {'time': time.mktime(dt.datetime.now(
+                    ).timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                     self.cache_weather_results(weather_cache_response)
                     local_weather = WeatherReport(response)
                 except:
-                    response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
-                    weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
+                    response = self.localbackend.get_report_for_weather_onecall_type(
+                        query=query_parameters)
+                    weather_cache_response = {'time': time.mktime(dt.datetime.now(
+                    ).timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                     self.cache_weather_results(weather_cache_response)
-                    local_weather = WeatherReport(response)    
+                    local_weather = WeatherReport(response)
             else:
                 local_weather = WeatherReport(response)
-        else:        
-            try: 
+        else:
+            try:
                 api_request = dict(path="/onecall", query=query_parameters)
                 response = self.request(api_request)
-                weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
+                weather_cache_response = {'time': time.mktime(dt.datetime.now(
+                ).timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                 self.cache_weather_results(weather_cache_response)
                 local_weather = WeatherReport(response)
             except:
-                response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
-                weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
+                response = self.localbackend.get_report_for_weather_onecall_type(
+                    query=query_parameters)
+                weather_cache_response = {'time': time.mktime(dt.datetime.now(
+                ).timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                 self.cache_weather_results(weather_cache_response)
                 local_weather = WeatherReport(response)
-        
+
         return local_weather
-    
+
     def cache_weather_results(self, weather_response):
-        cache_response = {'time': weather_response["time"], 'lat': weather_response["lat"], 'lon': weather_response["lon"], 'response': weather_response["response"]}
+        cache_response = {'time': weather_response["time"], 'lat': weather_response["lat"],
+                          'lon': weather_response["lon"], 'response': weather_response["response"]}
         if "caches" in self.cache_response_location:
             cache_responses = self.cache_response_location["caches"]
-        else: 
+        else:
             cache_responses = []
-        
+
         if cache_response not in cache_responses:
             cache_responses.append(cache_response)
-            
+
         self.cache_response_location["caches"] = cache_responses
         self.cache_response_location.store()
-        
+
     def check_if_cached_weather_exist(self, latitude, longitude):
         if "caches" in self.cache_response_location:
             cache_responses = self.cache_response_location["caches"]
@@ -167,18 +176,18 @@ class OpenWeatherMapApi(Api):
                     return False
         else:
             return False
-    
+
     def get_cached_weather_results(self, latitude, longitude):
         if "caches" in self.cache_response_location:
             cache_responses = self.cache_response_location["caches"]
             for cache_response in cache_responses:
                 if cache_response["lat"] == latitude and cache_response["lon"] == longitude:
                     return [cache_response['time'], cache_response["response"]]
-                
+
     def clear_cache_timer(self):
         if "caches" in self.cache_response_location:
             threading.Timer(900, self.clear_cache).start()
-    
+
     def clear_cache(self):
         os.remove(self.cache_response_location.path)
 
