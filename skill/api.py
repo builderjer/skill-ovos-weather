@@ -29,6 +29,7 @@ from .ovosapiservice import OVOSApiService
 from json_database import JsonStorageXDG 
 import threading
 import datetime as dt
+import time
 
 OPEN_WEATHER_MAP_LANGUAGES = (
     "af",
@@ -110,19 +111,20 @@ class OpenWeatherMapApi(Api):
         )
         self.clear_cache_timer()
         if self.check_if_cached_weather_exist(latitude, longitude):
-            response = self.get_cached_weather_results(latitude, longitude)
+            cache_time = self.get_cached_weather_results(latitude, longitude)[0]
+            response = self.get_cached_weather_results(latitude, longitude)[1]
             
             # add additional check for if the time is more than 15 minutes old and if so, refresh the cache
-            if dt.datetime.now() - dt.datetime.strptime(response["time"], "%Y-%m-%d %H:%M:%S") > dt.timedelta(minutes=15):
-                try: 
+            if dt.datetime.now() - dt.datetime.fromtimestamp(cache_time) > dt.timedelta(minutes=15):
+                try:
                     api_request = dict(path="/onecall", query=query_parameters)
                     response = self.request(api_request)
-                    weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
+                    weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                     self.cache_weather_results(weather_cache_response)
                     local_weather = WeatherReport(response)
                 except:
                     response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
-                    weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
+                    weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                     self.cache_weather_results(weather_cache_response)
                     local_weather = WeatherReport(response)    
             else:
@@ -131,19 +133,19 @@ class OpenWeatherMapApi(Api):
             try: 
                 api_request = dict(path="/onecall", query=query_parameters)
                 response = self.request(api_request)
-                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
+                weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                 self.cache_weather_results(weather_cache_response)
                 local_weather = WeatherReport(response)
             except:
                 response = self.localbackend.get_report_for_weather_onecall_type(query=query_parameters)
-                weather_cache_response = {'lat': latitude, 'lon': longitude, 'response': response, 'time': dt.datetime.now()}
+                weather_cache_response = {'time': time.mktime(dt.datetime.now().timetuple()), 'lat': latitude, 'lon': longitude, 'response': response}
                 self.cache_weather_results(weather_cache_response)
                 local_weather = WeatherReport(response)
         
         return local_weather
     
     def cache_weather_results(self, weather_response):
-        cache_response = {'lat': weather_response["lat"], 'lon': weather_response["lon"], 'response': weather_response["response"]}
+        cache_response = {'time': weather_response["time"], 'lat': weather_response["lat"], 'lon': weather_response["lon"], 'response': weather_response["response"]}
         if "caches" in self.cache_response_location:
             cache_responses = self.cache_response_location["caches"]
         else: 
@@ -171,7 +173,7 @@ class OpenWeatherMapApi(Api):
             cache_responses = self.cache_response_location["caches"]
             for cache_response in cache_responses:
                 if cache_response["lat"] == latitude and cache_response["lon"] == longitude:
-                    return cache_response["response"]
+                    return [cache_response['time'], cache_response["response"]]
                 
     def clear_cache_timer(self):
         if "caches" in self.cache_response_location:
