@@ -60,14 +60,17 @@ class WeatherSkill(MycroftSkill):
 
     def __init__(self):
         super().__init__("WeatherSkill")
-        self.weather_api = OpenWeatherMapApi()
-        self.weather_api.set_language_parameter(self.lang)
-        self.platform = self.config_core["enclosure"].get("platform", "unknown")
+        self.weather_api = None
+        self.platform = None
         self.weather_config = None
 
     def initialize(self):
         """Do these things after the skill is loaded."""
+        self.weather_api = OpenWeatherMapApi()
+        self.weather_api.set_language_parameter(self.lang)
+        self.platform = self.config_core["enclosure"].get("platform", "unknown")
         self.weather_config = WeatherConfig(self.config_core, self.settings)
+        
 
     @intent_handler(
         AdaptIntent()
