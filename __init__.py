@@ -66,11 +66,14 @@ class WeatherSkill(MycroftSkill):
 
     def initialize(self):
         """Do these things after the skill is loaded."""
+        self.bus.on("skill-ovos-weather.openvoiceos.weather.request",
+                    self.get_current_weather_homescreen)
+
         self.weather_api = OpenWeatherMapApi()
         self.weather_api.set_language_parameter(self.lang)
         self.platform = self.config_core["enclosure"].get("platform", "unknown")
         self.weather_config = WeatherConfig(self.config_core, self.settings)
-        
+
 
     @intent_handler(
         AdaptIntent()
@@ -1075,7 +1078,7 @@ class WeatherSkill(MycroftSkill):
         self.speak_dialog(dialog.name, dialog.data, wait=True)
 
     @skill_api_method
-    def get_current_weather_homescreen(self):
+    def get_current_weather_homescreen(self, message=None):
         """Get the current temperature and weather condition.
         Returns:
             Dict: {
@@ -1107,6 +1110,8 @@ class WeatherSkill(MycroftSkill):
                 system_unit=system_unit
             )
 
+            self.bus.emit(Message("skill-ovos-weather.openvoiceos.weather.response",
+                                  {"report": result}))
             return result
         except Exception:
             self.log.exception("Unexpected error getting weather for skill API.")
