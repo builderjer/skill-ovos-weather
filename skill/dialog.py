@@ -62,6 +62,7 @@ class WeatherDialog:
         self.config = config
         self.name = None
         self.data = None
+        self.temperature_unit = config.temperature_unit(intent_data.scale)
 
     def _add_location(self):
         """Add location information to the dialog."""
@@ -102,7 +103,7 @@ class CurrentDialog(WeatherDialog):
         self.data = dict(
             condition=self.weather.condition.description,
             temperature=self.weather.temperature,
-            temperature_unit=self.config.temperature_unit,
+            temperature_unit=self.temperature_unit,
         )
         self._add_location()
 
@@ -129,7 +130,7 @@ class CurrentDialog(WeatherDialog):
         else:
             self.data = dict(temperature=self.weather.temperature)
         self.data.update(
-            temperature_unit=self.intent_data.unit or self.config.temperature_unit
+            temperature_unit=self.temperature_unit
         )
         self._add_location()
 
@@ -219,7 +220,7 @@ class HourlyDialog(WeatherDialog):
         self.data = dict(
             temperature=self.weather.temperature,
             time=get_time_period(self.weather.date_time),
-            temperature_unit=self.intent_data.unit or self.config.temperature_unit,
+            temperature_unit=self.temperature_unit,
         )
         self._add_location()
 
@@ -307,7 +308,7 @@ class DailyDialog(WeatherDialog):
             self.data = dict(temperature=self.weather.temperature.day)
         self.data.update(
             day=get_speakable_day_of_week(self.weather.date_time),
-            temperature_unit=self.intent_data.unit or self.config.temperature_unit,
+            temperature_unit=self.temperature_unit,
         )
         self._add_location()
 
