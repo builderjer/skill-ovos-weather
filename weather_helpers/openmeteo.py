@@ -8,8 +8,10 @@ import requests
 # so annoying
 from .config import *
 from .weather import WeatherReport
+from ovos_utils import timed_lru_cache
 
 
+@timed_lru_cache(seconds=60*15)  # cache for 15 mins
 def get_report(cfg: WeatherConfig):
     if cfg.speed_unit == MILES_PER_HOUR:
         windspeed_unit = "mph"

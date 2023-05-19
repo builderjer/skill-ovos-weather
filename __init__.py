@@ -636,9 +636,7 @@ class WeatherSkill(OVOSSkill):
                 four_day_forecast = weather.daily[1:5]
                 self._display_multi_day_forecast(four_day_forecast, intent_data)
 
-    def _display_current_conditions(
-            self, weather: WeatherReport, weather_location: str
-    ):
+    def _display_current_conditions(self, weather: WeatherReport, weather_location: str):
         """Display current weather conditions on a screen.
 
         This is the first screen that shows.  Others will follow.
@@ -784,9 +782,7 @@ class WeatherSkill(OVOSSkill):
             for dialog in dialogs:
                 self._speak_weather(dialog)
 
-    def _build_forecast_dialogs(
-            self, forecast: List[Weather], intent_data: WeatherIntent
-    ) -> List[DailyDialog]:
+    def _build_forecast_dialogs(self, forecast: List[Weather], intent_data: WeatherIntent) -> List[DailyDialog]:
         """
         Build the dialogs for each of the forecast days being reported to the user.
 
@@ -822,9 +818,7 @@ class WeatherSkill(OVOSSkill):
             for dialog in dialogs:
                 self._speak_weather(dialog)
 
-    def _build_weekly_condition_dialogs(
-            self, forecast: List[Weather], intent_data: WeatherIntent
-    ) -> List[WeeklyDialog]:
+    def _build_weekly_condition_dialogs(self, forecast: List[Weather], intent_data: WeatherIntent) -> List[WeeklyDialog]:
         """Build the dialog communicating a weather condition on days it is forecasted.
 
         Args:
