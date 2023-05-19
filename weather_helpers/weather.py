@@ -269,51 +269,6 @@ class Weather:
     def __init__(self, weather: dict, timezone: str, units: dict):
         self.date_time = convert_to_local_datetime(weather["time"], timezone)
         self.units = units  # if any conversion is needed, this tells us the source units in the raw data
-        # {'apparent_temperature': '°C',
-        #                   'cape': 'J/kg',
-        #                   'cloudcover': '%',
-        #                   'cloudcover_high': '%',
-        #                   'cloudcover_low': '%',
-        #                   'cloudcover_mid': '%',
-        #                   'dewpoint_2m': '°C',
-        #                   'diffuse_radiation': 'W/m²',
-        #                   'direct_radiation': 'W/m²',
-        #                   'et0_fao_evapotranspiration': 'mm',
-        #                   'evapotranspiration': 'mm',
-        #                   'freezinglevel_height': 'm',
-        #                   'is_day': '',
-        #                   'precipitation': 'mm',
-        #                   'precipitation_probability': '%',
-        #                   'pressure_msl': 'hPa',
-        #                   'relativehumidity_2m': '%',
-        #                   'shortwave_radiation': 'W/m²',
-        #                   'showers': 'mm',
-        #                   'snow_depth': 'm',
-        #                   'snowfall': 'cm',
-        #                   'soil_moisture_0_1cm': 'm³/m³',
-        #                   'soil_moisture_1_3cm': 'm³/m³',
-        #                   'soil_moisture_27_81cm': 'm³/m³',
-        #                   'soil_moisture_3_9cm': 'm³/m³',
-        #                   'soil_moisture_9_27cm': 'm³/m³',
-        #                   'soil_temperature_0cm': '°C',
-        #                   'soil_temperature_18cm': '°C',
-        #                   'soil_temperature_54cm': '°C',
-        #                   'soil_temperature_6cm': '°C',
-        #                   'surface_pressure': 'hPa',
-        #                   'temperature_2m': '°C',
-        #                   'time': 'iso8601',
-        #                   'vapor_pressure_deficit': 'kPa',
-        #                   'visibility': 'm',
-        #                   'weathercode': 'wmo code',
-        #                   'winddirection_10m': '°',
-        #                   'winddirection_120m': '°',
-        #                   'winddirection_180m': '°',
-        #                   'winddirection_80m': '°',
-        #                   'windgusts_10m': 'm/s',
-        #                   'windspeed_10m': 'm/s',
-        #                   'windspeed_120m': 'm/s',
-        #                   'windspeed_180m': 'm/s',
-        #                   'windspeed_80m': 'm/s'},
         # TODO - handle any missing data that we can derive
         self.pressure = weather.get("surface_pressure")
         self.humidity = weather.get("relativehumidity_2m")
@@ -334,7 +289,6 @@ class Weather:
         self.temperature_low = weather.get("temperature_2m_min")
         self.temperature_high = weather.get("temperature_2m_max")
         self.chance_of_precipitation = weather.get("precipitation_probability_mean")
-
         self.condition = WeatherCondition(weather["weathercode"])
 
     @staticmethod
