@@ -19,7 +19,7 @@ import pytz
 from lingua_franca.format import nice_date
 from lingua_franca.parse import extract_datetime
 from ovos_backend_client.api import GeolocationApi
-from ovos_utils.time import now_local
+from ovos_utils.time import now_local, to_local
 
 
 class LocationNotFoundError(ValueError):
@@ -36,16 +36,14 @@ def convert_to_local_datetime(isodate: str, timezone: str) -> datetime:
 
     Args:
         isodate: seconds since epoch
-        timezone: the timezone requested by the user
+        timezone: the timezone of the weather report
 
     Returns:
-        A datetime in the passed timezone based on the passed timestamp
+        A datetime in the user timezone
     """
     naive_datetime = datetime.fromisoformat(isodate)
-    utc_datetime = pytz.utc.localize(naive_datetime)
-    local_timezone = pytz.timezone(timezone)
-    local_datetime = utc_datetime.astimezone(local_timezone)
-    return local_datetime
+    tz_datetime = naive_datetime.astimezone(pytz.timezone(timezone))
+    return to_local(tz_datetime)
 
 
 def get_utterance_datetime(
