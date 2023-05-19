@@ -13,7 +13,6 @@
 # limitations under the License.
 """Utility functions for the weather skill."""
 from datetime import datetime, timedelta, tzinfo
-from time import time
 
 import pytz
 from lingua_franca.format import nice_date
@@ -24,7 +23,6 @@ from ovos_utils.time import now_local, to_local
 
 class LocationNotFoundError(ValueError):
     """Raise when the API cannot find the requested location."""
-
     pass
 
 
@@ -126,7 +124,6 @@ def get_time_period(intent_datetime: datetime) -> str:
         period = "evening"
     else:
         period = "overnight"
-
     return period
 
 

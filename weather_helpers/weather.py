@@ -379,17 +379,6 @@ class Weather:
         return wind_strength
 
 
-class WeatherAlert:  # TODO - delete or derive from data/other api
-    """Data representation of a weather conditions JSON object from the API"""
-
-    def __init__(self, alert: dict, timezone: str):
-        self.sender = alert.get("sender_name")
-        self.event = alert["event"]
-        self.start = convert_to_local_datetime(alert["start"], timezone)
-        self.end = convert_to_local_datetime(alert["end"], timezone)
-        self.description = alert["description"]
-
-
 class WeatherReport:
     """Full representation of the data returned by the OpenMeteo API"""
 
@@ -438,11 +427,6 @@ class WeatherReport:
             # 'precipitation_probability_mean', 'precipitation_probability_min', 'precipitation_probability_max',
             # 'uv_index_clear_sky_max']
             self.daily.append(Weather(r, timezone, report["daily_units"]))
-
-        #if "alerts" in report:
-        #    self.alerts = [WeatherAlert(alert, timezone) for alert in report["alerts"]]
-        #else:
-        self.alerts = None
 
     def get_weather_for_intent(self, intent_data):
         """Use the intent to determine which forecast satisfies the request.
