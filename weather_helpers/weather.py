@@ -271,7 +271,8 @@ class Weather:
         self.units = units  # if any conversion is needed, this tells us the source units in the raw data
         # TODO - handle any missing data that we can derive
         self.pressure = weather.get("surface_pressure")
-        self.humidity = weather.get("relativehumidity_2m")
+        self.humidity = weather.get("relativehumidity_2m") or \
+                        weather.get("relativehumidity_1000hPa")
         self.dew_point = weather.get("dewpoint_2m")
         self.clouds = weather.get("cloudcover")
         self.wind_speed = weather.get("windspeed_10m")

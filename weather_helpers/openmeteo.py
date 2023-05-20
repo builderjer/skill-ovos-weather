@@ -1,4 +1,6 @@
 import requests
+from ovos_utils import timed_lru_cache
+
 # TODO - get rid of relative imports
 # /home/miro/PycharmProjects/.venvs/ovos/bin/python /home/miro/PycharmProjects/skill-ovos-weather/weather_helpers/openmeteo.py
 # Traceback (most recent call last):
@@ -8,10 +10,9 @@ import requests
 # so annoying
 from .config import *
 from .weather import WeatherReport
-from ovos_utils import timed_lru_cache
 
 
-@timed_lru_cache(seconds=60*15)  # cache for 15 mins
+@timed_lru_cache(seconds=60 * 15)  # cache for 15 mins
 def get_report(cfg: WeatherConfig):
     if cfg.speed_unit == MILES_PER_HOUR:
         windspeed_unit = "mph"
@@ -99,6 +100,7 @@ def get_report(cfg: WeatherConfig):
                      "soil_moisture_3_9cm",
                      "soil_moisture_9_27cm",
                      "soil_moisture_27_81cm",
+                     "relativehumidity_1000hPa",
                      "is_day"]
 
     args = {
