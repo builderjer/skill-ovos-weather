@@ -72,20 +72,25 @@ class WeatherIntent:
 
     @property
     def geolocation(self):
-        """Lookup the intent location using the Selene API.
+        """Lookup the intent location using the geolocation API.
 
-        The Selene geolocation API assumes the location of a city is being
+        The geolocation API assumes the location of a city is being
         requested.  If the user asks "What is the weather in Russia"
-        an error will be raised.
+        the results are fuzzy
+
+        "what is the weather in russia" can be interpreted:
+        - default to capital city  <- the geolocation api would say "Россия"
+        - min and max / avg across the country
+        - "damn freezing" if we are sarcastic bot
+
+        all are valid interpretations and are better than "an error occurred"
+        what would you, a human, answer to the question
         """
         if self._geolocation is None:
             if self.location is None:
                 self._geolocation = dict()
             else:
                 self._geolocation = get_geolocation(self.location)
-                if self._geolocation["city"].lower() not in self.location.lower():
-                    raise LocationNotFoundError(self.location + " is not a city")
-
         return self._geolocation
 
     @property

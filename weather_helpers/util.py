@@ -99,7 +99,7 @@ def get_geolocation(location: str):
     geolocation = geolocation_api.get_geolocation(location)
 
     if geolocation is None:
-        raise LocationNotFoundError("Location {} is unknown".format(location))
+        raise LocationNotFoundError(f"Location {location} is unknown")
 
     return geolocation
 
