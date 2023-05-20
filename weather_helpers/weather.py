@@ -286,9 +286,12 @@ class Weather:
             self.sunset = convert_to_local_datetime(self.sunset, timezone)
         self.temperature = weather.get("temperature")
         self.visibility = weather.get("visibility")
-        self.temperature_low = weather.get("temperature_2m_min")
-        self.temperature_high = weather.get("temperature_2m_max")
-        self.chance_of_precipitation = weather.get("precipitation_probability_mean")
+        self.temperature_low = weather.get("temperature_2m_min") or self.temperature
+        self.temperature_high = weather.get("temperature_2m_max") or self.temperature
+        self.chance_of_precipitation = weather.get("precipitation_probability_mean") or \
+                                       weather.get("precipitation_probability_max") or \
+                                       weather.get("precipitation_probability_min") or \
+                                       weather.get("precipitation_probability") or 0
         self.condition = WeatherCondition(weather["weathercode"])
 
     @staticmethod
