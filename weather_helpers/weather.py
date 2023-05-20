@@ -126,43 +126,43 @@ class WeatherCondition:
         # TODO - localization + improve icon/category mappings
         weather_code = int(weather_code)
         if weather_code <= 1: # clear
-            self.condition = "clear"
+            self.category = "clear"
             if is_day:
                 self.icon = "01d"  # sun
             else:
                 self.icon = "01n"  # moon
         elif 2 <= weather_code <= 3: # clouds
-            self.condition = "clouds"
+            self.category = "clouds"
             if is_day:
                 self.icon = "02d"
             else:
                 self.icon = "02n"
         elif 45 <= weather_code <= 48: # fog
-            self.condition = "fog"
+            self.category = "fog"
             if is_day:
                 self.icon = "50d"
             else:
                 self.icon = "50n"
         elif 51 <= weather_code <= 67: # rain
-            self.condition = "rain"
+            self.category = "rain"
             if is_day:
                 self.icon = "10d"
             else:
                 self.icon = "10n"
         elif 71 <= weather_code <= 77 or 85 <= weather_code <= 86: # snow
-            self.condition = "snow"
+            self.category = "snow"
             if is_day:
                 self.icon = "13d"
             else:
                 self.icon = "13n"
         elif 80 <= weather_code <= 86: # rain shower
-            self.condition = "rain"
+            self.category = "rain"
             if is_day:
                 self.icon = "09d"
             else:
                 self.icon = "09n"
         elif 95 <= weather_code <= 99: # thunderstorm
-            self.condition = "thunderstorm"
+            self.category = "thunderstorm"
             if is_day:
                 self.icon = "11d"
             else:
